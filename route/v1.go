@@ -27,7 +27,9 @@ func InitV1Router() http.Handler {
 	})))
 	e.Use(echo_middleware.Gzip())
 	e.Use(echo_middleware.Recover())
-	e.Use(echo_middleware.Logger())
+	e.Use(echo_middleware.LoggerWithConfig(echo_middleware.LoggerConfig{
+		Skipper: skipInternalStatusLog,
+	}))
 
 	e.GET("/v1/sys/debug", v1.GetSystemConfigDebug) // //debug
 
@@ -198,4 +200,11 @@ func InitV1Router() http.Handler {
 	}
 
 	return e
+}
+
+// skipInternalStatusLog keeps the access log from being flooded by the
+// periodic status reports local services post to the core every few seconds.
+func skipInternalStatusLog(c echo.Context) bool {
+	ip := c.RealIP()
+	return c.Path() == "/v1/notify/system_status" && (ip == "::1" || ip == "127.0.0.1")
 }
