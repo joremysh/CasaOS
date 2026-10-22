@@ -1,0 +1,16 @@
+# Run the test suite in Linux:
+#   docker compose run --rm test
+#   docker compose run --rm test go test -v ./route/...
+services:
+  test:
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    volumes:
+      - .:/src
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+
+volumes:
+  go-mod-cache:
+  go-build-cache:
