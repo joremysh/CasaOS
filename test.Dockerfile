@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Linux environment for running the Go test suite (service/ only builds on Linux).
 # The source is mounted at /src by docker-compose.yml, not copied in.
-FROM golang:1.26.9
+FROM golang:1.26.10
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends netcat-openbsd \
