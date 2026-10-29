@@ -1,6 +1,8 @@
 # Run the test suite in Linux:
 #   docker compose run --rm test
 #   docker compose run --rm test go test -v ./route/...
+# Run CasaOS with its backend services and web UI (see dev/build.sh):
+#   make dev
 services:
   test:
     build:
@@ -11,6 +13,25 @@ services:
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
 
+  dev:
+    profiles: [dev]
+    build:
+      context: .
+      dockerfile: dev/Dockerfile
+    ports:
+      - "${HOST_PORT:-8080}:80"
+    environment:
+      - HOST_PORT=${HOST_PORT:-8080}
+    volumes:
+      - casaos-etc:/etc/casaos
+      - casaos-lib:/var/lib/casaos
+      - casaos-data:/DATA
+      # AppManagement runs apps on the host's Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
   go-mod-cache:
   go-build-cache:
+  casaos-etc:
+  casaos-lib:
+  casaos-data:
