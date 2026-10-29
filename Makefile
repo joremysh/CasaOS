@@ -1,4 +1,4 @@
-.PHONY: help generate build test lint fmt clean
+.PHONY: help generate build test lint fmt clean dev dev-down
 
 # service/ only builds on Linux, so build and vet target Linux even on macOS.
 GOARCH ?= $(shell go env GOARCH)
@@ -19,6 +19,13 @@ build: $(CODEGEN) ## Build a Linux binary at dist/casaos (GOARCH=amd64|arm64 to 
 
 test: ## Run the test suite in a Linux container (see docker-compose.yml)
 	docker compose run --rm test
+
+dev: ## Build from local sources and run CasaOS at http://localhost:8080 (see dev/build.sh)
+	./dev/build.sh
+	docker compose --profile dev up --build dev
+
+dev-down: ## Stop the dev container (add -v to also drop its data volumes)
+	docker compose --profile dev down
 
 lint: $(CODEGEN) ## Run go vet and check gofmt
 	GOOS=linux go vet ./...
